@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="main.java.mapper.RepairOrderMapper">
+    <resultMap id="RepairOrderMap" type="main.java.entity.RepairOrder">
+        <id property="id" column="id"/>
+        <result property="buildingNo" column="building_no"/>
+        <result property="roomNo" column="room_no"/>
+        <result property="description" column="description"/>
+        <result property="reporterId" column="reporter_id"/>
+        <result property="reportTime" column="report_time"/>
+        <result property="contactPhone" column="contact_phone"/>
+        <result property="status" column="status"/>
+        <result property="imagePath" column="image_path"/>
+        <result property="reporterName" column="reporter_name"/>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO repair_orders (building_no, room_no, description, reporter_id, 
+            report_time, contact_phone, status, image_path)
+        VALUES (#{buildingNo}, #{roomNo}, #{description}, #{reporterId}, 
+            #{reportTime}, #{contactPhone}, #{status}, #{imagePath})
+    </insert>
+
+    <update id="update">
+        UPDATE repair_orders SET 
+        building_no = #{buildingNo},
+        room_no = #{roomNo},
+        description = #{description},
+        contact_phone = #{contactPhone},
+        status = #{status},
+        image_path = #{imagePath}
+        WHERE id = #{id}
+    </update>
+
+    <select id="getById" resultMap="RepairOrderMap">
+        SELECT r.*, u.username as reporter_name 
+        FROM repair_orders r
+        LEFT JOIN users u ON r.reporter_id = u.id
+        WHERE r.id = #{id}
+    </select>
+
+    <select id="getByReporterId" resultMap="RepairOrderMap">
+        SELECT r.*, u.username as reporter_name 
+        FROM repair_orders r
+        LEFT JOIN users u ON r.reporter_id = u.id
+        WHERE r.reporter_id = #{reporterId}
+        ORDER BY r.report_time DESC
+    </select>
+
+    <select id="getByStatus" resultMap="RepairOrderMap">
+        SELECT r.*, u.username as reporter_name 
+        FROM repair_orders r
+        LEFT JOIN users u ON r.reporter_id = u.id
+        WHERE r.status = #{status}
+        ORDER BY r.report_time DESC
+    </select>
+
+    <select id="getAllOrderByTime" resultMap="RepairOrderMap">
+        SELECT r.*, u.username as reporter_name 
+        FROM repair_orders r
+        LEFT JOIN users u ON r.reporter_id = u.id
+        ORDER BY r.report_time DESC
+    </select>
+</mapper> 

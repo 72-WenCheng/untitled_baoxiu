@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="main.java.mapper.WorkOrderMapper">
+    <resultMap id="WorkOrderMap" type="main.java.entity.WorkOrder">
+        <id property="id" column="id"/>
+        <result property="repairOrderId" column="repair_order_id"/>
+        <result property="maintenanceId" column="maintenance_id"/>
+        <result property="assignTime" column="assign_time"/>
+        <result property="status" column="status"/>
+        <result property="faultAnalysis" column="fault_analysis"/>
+        <result property="repairProcess" column="repair_process"/>
+        <result property="repairResult" column="repair_result"/>
+        <result property="maintenanceName" column="maintenance_name"/>
+        <association property="repairOrder" javaType="main.java.entity.RepairOrder">
+            <id property="id" column="ro_id"/>
+            <result property="buildingNo" column="ro_building_no"/>
+            <result property="roomNo" column="ro_room_no"/>
+            <result property="description" column="ro_description"/>
+            <result property="reporterId" column="ro_reporter_id"/>
+            <result property="reportTime" column="ro_report_time"/>
+            <result property="contactPhone" column="ro_contact_phone"/>
+            <result property="status" column="ro_status"/>
+            <result property="imagePath" column="ro_image_path"/>
+            <result property="reporterName" column="ro_reporter_name"/>
+        </association>
+    </resultMap>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO work_orders (repair_order_id, maintenance_id, assign_time, status)
+        VALUES (#{repairOrderId}, #{maintenanceId}, #{assignTime}, #{status})
+    </insert>
+
+    <update id="update">
+        UPDATE work_orders SET 
+        status = #{status},
+        fault_analysis = #{faultAnalysis},
+        repair_process = #{repairProcess},
+        repair_result = #{repairResult}
+        WHERE id = #{id}
+    </update>
+
+    <select id="getById" resultMap="WorkOrderMap">
+        SELECT w.*, u.username as maintenance_name,
+            r.id as ro_id, r.building_no as ro_building_no,
+            r.room_no as ro_room_no, r.description as ro_description,
+            r.reporter_id as ro_reporter_id, r.report_time as ro_report_time,
+            r.contact_phone as ro_contact_phone, r.status as ro_status,
+            r.image_path as ro_image_path, u2.username as ro_reporter_name
+        FROM work_orders w
+        LEFT JOIN users u ON w.maintenance_id = u.id
+        LEFT JOIN repair_orders r ON w.repair_order_id = r.id
+        LEFT JOIN users u2 ON r.reporter_id = u2.id
+        WHERE w.id = #{id}
+    </select>
+
+    <select id="getByMaintenanceId" resultMap="WorkOrderMap">
+        SELECT w.*, u.username as maintenance_name,
+            r.id as ro_id, r.building_no as ro_building_no,
+            r.room_no as ro_room_no, r.description as ro_description,
+            r.reporter_id as ro_reporter_id, r.report_time as ro_report_time,
+            r.contact_phone as ro_contact_phone, r.status as ro_status,
+            r.image_path as ro_image_path, u2.username as ro_reporter_name
+        FROM work_orders w
+        LEFT JOIN users u ON w.maintenance_id = u.id
+        LEFT JOIN repair_orders r ON w.repair_order_id = r.id
+        LEFT JOIN users u2 ON r.reporter_id = u2.id
+        WHERE w.maintenance_id = #{maintenanceId}
+        ORDER BY w.assign_time DESC
+    </select>
+
+    <select id="getByStatus" resultMap="WorkOrderMap">
+        SELECT w.*, u.username as maintenance_name,
+            r.id as ro_id, r.building_no as ro_building_no,
+            r.room_no as ro_room_no, r.description as ro_description,
+            r.reporter_id as ro_reporter_id, r.report_time as ro_report_time,
+            r.contact_phone as ro_contact_phone, r.status as ro_status,
+            r.image_path as ro_image_path, u2.username as ro_reporter_name
+        FROM work_orders w
+        LEFT JOIN users u ON w.maintenance_id = u.id
+        LEFT JOIN repair_orders r ON w.repair_order_id = r.id
+        LEFT JOIN users u2 ON r.reporter_id = u2.id
+        WHERE w.status = #{status}
+        ORDER BY w.assign_time DESC
+    </select>
+
+    <select id="getByRepairOrderId" resultMap="WorkOrderMap">
+        SELECT w.*, u.username as maintenance_name,
+               r.id as ro_id, r.building_no as ro_building_no,
+               r.room_no as ro_room_no, r.description as ro_description,
+               r.reporter_id as ro_reporter_id, r.report_time as ro_report_time,
+               r.contact_phone as ro_contact_phone, r.status as ro_status,
+               r.image_path as ro_image_path, u2.username as ro_reporter_name
+        FROM work_orders w
+                 LEFT JOIN users u ON w.maintenance_id = u.id
+                 LEFT JOIN repair_orders r ON w.repair_order_id = r.id
+                 LEFT JOIN users u2 ON r.reporter_id = u2.id
+        WHERE w.repair_order_id = #{repairOrderId}
+        ORDER BY w.assign_time DESC
+    </select>
+</mapper> 
